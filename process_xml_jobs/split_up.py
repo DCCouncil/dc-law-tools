@@ -47,3 +47,5 @@ def split_up():
     with open(dst_dir + '/code/index.xml', 'wb') as f:
         f.write(et.tostring(dom, pretty_print=True, encoding="utf-8"))
 
+if __name__ == '__main__':
+    split_up()

@@ -71,3 +71,6 @@ def insert_tables():
 
     with open(out_path, 'wb') as f:
         f.write(etree.tostring(dom, pretty_print=True, encoding="utf-8"))
+
+if __name__ == '__main__':
+    insert_tables()

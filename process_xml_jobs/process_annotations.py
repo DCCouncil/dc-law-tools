@@ -13,7 +13,7 @@ To add a new transform, add it to the list defined in
 
 import os.path
 import lxml.etree as et
-from .annotation_transforms import transforms
+from annotation_transforms import transforms
 
 DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -32,3 +32,6 @@ def process_annotations():
 
     with open(dst_file, 'wb') as f:
         f.write(et.tostring(dom, pretty_print=True, encoding="utf-8"))
+
+if __name__ == '__main__':
+    process_annotations()
