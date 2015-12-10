@@ -1,5 +1,11 @@
-from pprint import pprint
+"""
+There are ~3000 unique headings in the raw code.
+There are only about 40 semantically distinct headings.
 
+This script normalizes all the headings to one of those
+~40 headings.
+"""
+from pprint import pprint
 def normalize_headings (dom):
     print('  normalizing headings...')
     heading_nodes = dom.xpath('//annoGroup/heading')
