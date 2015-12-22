@@ -5,7 +5,9 @@ Each statute should (but might not always)
 
 This script first transforms the dom such that:
 
-    <code>...</code>  
+    <law>
+      <code>...</code>
+    </law>
 
 becomes:
 
@@ -41,5 +43,30 @@ TODO: figure out federal statute structure...
     </fed></statutes></law>
 
 """
+import lxml.etree as et
+import re
+
+dc_law_re = re.compile(r"D\.?\s*C\.?\s+Law\s+(\d+)\s?[-–]+\s?(\d+\w?)")
+
 def make_statutes(dom):
-    print('  make_statutes not implemented')
+    statutes_node = et.Element('statutes')
+    dom.getroot().append(statutes_node)
+    dc_statutes_node = et.Element('dc')
+    statutes_node.append(dc_statutes_node)
+
+    code_string = et.tostring(dom).decode()
+
+
+    dc_law_cite_nums = dc_law_re.findall(code_string)
+
+    dc_law_cites = ['-'.join(x) for x in dc_law_cite_nums]
+
+    dc_law_cites = set(dc_law_cites)
+
+    for cite in dc_law_cites:
+        statute_node = et.Element('statute')
+        dc_statutes_node.append(statute_node)
+        statute_node.attrib['stub'] = 'true'
+        law_num_node = et.Element('lawNum')
+        statute_node.append(law_num_node)
+        law_num_node.text = cite
