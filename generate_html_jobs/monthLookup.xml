@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<months>
+  <month num="1">January</month>
+  <month num="2">February</month>
+  <month num="3">March</month>
+  <month num="4">April</month>
+  <month num="5">May</month>
+  <month num="6">June</month>
+  <month num="7">July</month>
+  <month num="8">August</month>
+  <month num="9">September</month>
+  <month num="10">October</month>
+  <month num="11">November</month>
+  <month num="12">December</month>
+</months>
