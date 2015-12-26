@@ -33,6 +33,9 @@
               <xsl:apply-templates select="./*/cache/ancestors" />
               <xsl:apply-templates select="./*/cache/siblings/prev" />
               <xsl:apply-templates select="./*/cache/siblings/next" />
+              <xsl:if test="$genpath/ancestor::code">
+                <xsl:call-template name="genNav" />
+              </xsl:if>
               <xsl:apply-templates select="//recency[1]" />
             </div>
             <div class="col8">
@@ -59,71 +62,150 @@
       </h1>
     </div>
     <div class="line-group toc" data-swiftype-index="true">
-      <xsl:apply-templates select="container" />
-    </div>
-  </xsl:template>
-
-  <xsl:template match="container[parent::code or parent::container/@childPrefix = 'Subtitle']">
-        <div class="line subheading" style="text-indent: 0em;">
-          <p>
-            Division <xsl:value-of select="num" />. <xsl:value-of select="heading" />
-          </p>
-        </div>
-        <!-- <xsl:for-each select="container|section">
-          <xsl:call-template name="makeLink">
+        <xsl:for-each select="container">
+          <xsl:call-template name="makeTOC">
             <xsl:with-param name="node" select="." />
           </xsl:call-template>
-        </xsl:for-each> -->
-        <xsl:apply-templates select="container|section" />
+        </xsl:for-each>
+    </div>
   </xsl:template>
 
-  <xsl:template match="container|section">
-    <div class="line child-link " style="text-indent: 0em">
-      <div>
-        <span class="title">
-          <a class="internal-link">
-            <xsl:attribute name="href">
-              <xsl:call-template name="genUrl">
-                <xsl:with-param name="node" select="." />
-              </xsl:call-template>
-            </xsl:attribute>
-            <xsl:apply-templates select="heading" />
-          </a>
-        </span>
-      </div>
-      <xsl:if test="(.//section)[1]">
-        <div>
-          <span class="range">
-            §§ <xsl:value-of select="(.//section)[1]/num" /> - <xsl:value-of select="(.//section)[last()]/num" />
-          </span>
-        </div>
-      </xsl:if>
+  <xsl:template match="container">
+    <div class="line-group line-group-page-heading">
+      <h1 data-swiftype-index="true">
+        <xsl:apply-templates select="heading" />
+      </h1>
     </div>
-<!--     <xsl:choose>
-      <xsl:when test="self::node() = $genpath/node()">
-        CONTAINER
+    <div class="line-group toc" data-swiftype-index="true">
+      <xsl:for-each select="container|section">
+        <xsl:call-template name="makeTOC">
+          <xsl:with-param name="node" select="." />
+        </xsl:call-template>
+      </xsl:for-each>
+    </div>
+  </xsl:template>
+
+  <xsl:template name="makeTOC">
+    <xsl:param name="node" />
+    <xsl:choose>
+      <!-- create heading for Divisions/Subtitles; iterate over children -->
+      <xsl:when test="$node/parent::*[@childPrefix = 'Division' or @childPrefix = 'Subtitle']">
+        <div class="line subheading" style="text-indent: 0em;">
+          <p>
+            <xsl:apply-templates select="heading" />
+          </p>
+        </div>
+        <xsl:for-each select="container|section">
+          <xsl:call-template name="makeTOC">
+            <xsl:with-param name="node" select="." />
+          </xsl:call-template>
+        </xsl:for-each>
       </xsl:when>
+      <!-- create link to everything else -->
       <xsl:otherwise>
         <div class="line child-link " style="text-indent: 0em">
           <div>
             <span class="title">
-              <a class="internal-link" href="{@url}">
-                <xsl:value-of select="@title" />
-              </a>
+              <xsl:call-template name="genLink">
+                <xsl:with-param name="node" select="." />
+                <xsl:with-param name="internal" select="true()" />
+              </xsl:call-template>
             </span>
           </div>
-          <xsl:if test="@section-start">
+          <xsl:if test="(.//section)[1]">
             <div>
               <span class="range">
-                §§ <xsl:value-of select="@section-start" /> - <xsl:value-of select="@section-end" />
+                §§ <xsl:value-of select="(.//section)[1]/num" /> - <xsl:value-of select="(.//section)[last()]/num" />
               </span>
             </div>
           </xsl:if>
         </div>
+
       </xsl:otherwise>
     </xsl:choose>
- -->
   </xsl:template>
+
+<!-- SIDEBAR NAV -->
+
+  <xsl:template name="genNav">
+    <h2>You Are Here</h2>
+    <ul class="ancestors">
+      <a href="/">Code of the District of Columbia</a>
+      <xsl:for-each select="$genpath/ancestor::container[not(../@childPrefix = 'Division' or ../@childPrefix = 'Subtitle')]">
+        <li>↪ <xsl:call-template name="genLink">
+          <xsl:with-param name="node" select="." />
+          <xsl:with-param name="internal" select="false()" />
+        </xsl:call-template></li>
+      </xsl:for-each>
+      <li>
+        ↪ <xsl:apply-templates select="$genpath/heading" />
+      </li>
+    </ul>
+
+    <xsl:call-template name="genPrev">
+      <xsl:with-param name="node" select="$genpath" />
+    </xsl:call-template>
+
+    <xsl:call-template name="genNext">
+      <xsl:with-param name="node" select="$genpath" />
+    </xsl:call-template>
+  </xsl:template>
+
+
+  <xsl:template name="genPrev">
+    <xsl:param name="node" />
+    <xsl:if test="$node/ancestor::code">
+      <h2>Previous</h2>
+      <xsl:choose>
+        <xsl:when test="$node/preceding-sibling::*[self::container or self::section][1]">
+          <p><xsl:call-template name="genLink">
+            <xsl:with-param name="node" select="$node/preceding-sibling::*[self::container or self::section][1]" />
+          </xsl:call-template></p>
+        </xsl:when>
+        <xsl:when test="$node/parent::*[../@childPrefix = 'Division' or ../@childPrefix = 'Subtitle']/preceding-sibling::container[1]/*[self::container or self::section][last()]">
+          <p><xsl:call-template name="genLink">
+            <xsl:with-param name="node" select="$node/parent::*[../@childPrefix = 'Division' or ../@childPrefix = 'Subtitle']/preceding-sibling::container[1]/*[self::container or self::section][last()]" />
+          </xsl:call-template></p>
+        </xsl:when>
+        <xsl:when test="$node/parent::*[../@childPrefix = 'Division' or ../@childPrefix = 'Subtitle']/..">
+          <p><xsl:call-template name="genLink">
+            <xsl:with-param name="node" select="$node/parent::*[../@childPrefix = 'Division' or ../@childPrefix = 'Subtitle']/.." />
+          </xsl:call-template></p>
+        </xsl:when>
+        <xsl:otherwise>
+          <p><xsl:call-template name="genLink">
+            <xsl:with-param name="node" select="$node/.." />
+          </xsl:call-template></p>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="genNext">
+    <xsl:param name="node" />
+    <xsl:variable name="next" select="$node/following-sibling::*[self::container or self::section][1]" />
+    <xsl:choose>
+      <xsl:when test="not($node/ancestor::code)"></xsl:when>
+      <xsl:when test="($next) and ($node/parent::*[@childPrefix = 'Division' or @childPrefix = 'Subtitle'])">
+        <h2>Next</h2>
+        <p><xsl:call-template name="genLink">
+          <xsl:with-param name="node" select="$next/*[self::container or self::section][1]" />
+        </xsl:call-template></p>
+      </xsl:when>
+      <xsl:when test="$next">
+        <h2>Next</h2>
+        <p><xsl:call-template name="genLink">
+          <xsl:with-param name="node" select="$next" />
+        </xsl:call-template></p>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="genNext">
+          <xsl:with-param name="node" select="$node/.." />
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
 <!-- RECENCY -->
 
   <xsl:template match="recency">
@@ -171,11 +253,6 @@
     <xsl:value-of select="concat($monthName, ' ', $day, ', ', $year)" />
   </xsl:template>
 
-  <xsl:template name="makeLink">
-    <xsl:param name="node" />
-
-  </xsl:template>
-
   <xsl:template name="genUrl">
     <xsl:param name="node" />
     <xsl:choose>
@@ -191,4 +268,21 @@
         </xsl:call-template><xsl:value-of select="$node/../@childPrefix" />-<xsl:value-of select="$node/num" />/</xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+
+  <xsl:template name="genLink">
+    <xsl:param name="node" />
+    <xsl:param name="internal" />
+    <a>
+      <xsl:if test="$internal">
+        <xsl:attribute name="class">internal-link</xsl:attribute>
+      </xsl:if>
+      <xsl:attribute name="href">
+        <xsl:call-template name="genUrl">
+          <xsl:with-param name="node" select="$node" />
+        </xsl:call-template>
+      </xsl:attribute>
+      <xsl:apply-templates select="$node/heading" />
+    </a>
+  </xsl:template>
+
 </xsl:stylesheet>
