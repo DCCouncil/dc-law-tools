@@ -5,9 +5,7 @@ Each statute should (but might not always)
 
 This script first transforms the dom such that:
 
-    <law>
-      <code>...</code>
-    </law>
+    <code>...</code>
 
 becomes:
 
@@ -49,13 +47,17 @@ import re
 dc_law_re = re.compile(r"D\.?\s*C\.?\s+Law\s+(\d+)\s?[-–]+\s?(\d+\w?)")
 
 def make_statutes(dom):
-    statutes_node = et.Element('statutes')
-    dom.getroot().append(statutes_node)
-    dc_statutes_node = et.Element('dc')
-    statutes_node.append(dc_statutes_node)
+    root = dom.getroot()
+
+    code_node = _make_node('code', root, root.getchildren(), **root.attrib)
+    root.tag = 'law'
+    for k in root.attrib.keys():
+      del root.attrib[k]
+
+    statutes_node = _make_node('statutes', root)
+    dc_statutes_node = _make_node('dc', statutes_node)
 
     code_string = et.tostring(dom).decode()
-
 
     dc_law_cite_nums = dc_law_re.findall(code_string)
 
@@ -64,9 +66,19 @@ def make_statutes(dom):
     dc_law_cites = set(dc_law_cites)
 
     for cite in dc_law_cites:
-        statute_node = et.Element('statute')
-        dc_statutes_node.append(statute_node)
-        statute_node.attrib['stub'] = 'true'
-        law_num_node = et.Element('lawNum')
-        statute_node.append(law_num_node)
-        law_num_node.text = cite
+        statute_node = _make_node('statute', dc_statutes_node, stub=True)
+        law_num_node = _make_node('lawNum', statute_node, text=cite)
+
+attr_lookup = {True: 'true', False: 'false'}
+
+def _make_node(tag, parent=None, children=[], text='', **attributes):
+    node = et.Element(tag)
+    if parent is not None:
+        parent.append(node)
+    for child in children:
+        node.append(child)
+    for k, v in attributes.items():
+        node.attrib[k] = attr_lookup.get(v, v)
+    if text:
+      node.text = text
+    return node
