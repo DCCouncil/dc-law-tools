@@ -1,0 +1,15 @@
+#!/usr/bin/env python
+import click
+from click import echo
+import build_xml
+import build_html
+
+@click.group()
+def build():
+	pass
+
+build_xml.click(build)
+build_html.click(build)
+
+if __name__ == '__main__':
+    build()

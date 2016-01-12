@@ -46,7 +46,7 @@ def split_up():
     
     print('writing sections...')
     for section in tqdm(sections):
-        split_and_link_node(section, 'code', 'sections/', write_to_disk=False)
+        split_and_link_node(section, 'code', 'sections/')
 
     print('writing titles...')
     titles = dom.xpath('//container[../@childPrefix = "Title"]')

@@ -12,32 +12,22 @@ import sys, lxml.etree as etree, re
 DIR = os.path.abspath(os.path.dirname(__file__))
 
 
-try:
-    xml_path = sys.argv[1]
-except IndexError:
-    xml_path = DIR + '/../working_files/dccode.xml'
-
-try:
-    tables_path = sys.argv[2]
-except IndexError:
-    tables_path = DIR + '/tables.xml'
-
-try:
-    out_path = sys.argv[3]
-except IndexError:
-    out_path = DIR + '/../working_files/dccode-tables.xml'
-
-with open(xml_path) as f:
-    xml = f.read() # etree.parse(f).getroot()
-
-with open(tables_path) as f:
-    Tables = etree.parse(f).getroot()
-
 num_re = re.compile('<num>(?P<num>.+?)</num>')
 table_re = re.compile(r'@@TABLE@@')
-sections = xml.split('<section>\n')
 
 def insert_tables():
+    xml_path = DIR + '/../working_files/dccode.xml'
+    tables_path = DIR + '/tables.xml'
+    out_path = DIR + '/../working_files/dccode-tables.xml'
+
+    with open(xml_path) as f:
+        xml = f.read() # etree.parse(f).getroot()
+
+    with open(tables_path) as f:
+        Tables = etree.parse(f).getroot()
+
+    sections = xml.split('<section>\n')
+
     print('inserting tables...')
     out = []
     for section in sections:
