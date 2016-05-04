@@ -30,13 +30,10 @@
         <div class="main container">
           <div class="clearfix" style="width: 100%;">
             <div id="sidebar" class="col4 quiet">
-              <xsl:apply-templates select="./*/cache/ancestors" />
-              <xsl:apply-templates select="./*/cache/siblings/prev" />
-              <xsl:apply-templates select="./*/cache/siblings/next" />
               <xsl:if test="$genpath/ancestor::code">
                 <xsl:call-template name="genNav" />
               </xsl:if>
-              <xsl:apply-templates select="//recency[1]" />
+              <xsl:apply-templates select="/laws/code/recency" />
             </div>
             <div class="col8">
               <div id="content">
@@ -146,11 +143,13 @@
         </xsl:call-template>
       </xsl:for-each>
     </div>
-    <xsl:for-each select=".//section">
-      <xsl:call-template name="makeTocSection">
-        <xsl:with-param name="node" select="." />
-      </xsl:call-template>
-    </xsl:for-each>
+    <xsl:if test="../@childPrefix != 'Title'">
+      <xsl:for-each select=".//section">
+        <xsl:call-template name="makeTocSection">
+          <xsl:with-param name="node" select="." />
+        </xsl:call-template>
+      </xsl:for-each>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template name="makeTocLink">
