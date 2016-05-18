@@ -5,7 +5,9 @@ There are only about 40 semantically distinct headings.
 This script normalizes all the headings to one of those
 ~40 headings.
 """
+
 from pprint import pprint
+
 def normalize_headings (dom):
     print('  normalizing headings...')
     heading_nodes = dom.xpath('//annoGroup/heading')
@@ -96,6 +98,8 @@ normalized_headings = {
   "emergency notes": "Emergency Legislation",
   "exchange of title over reservation 13": {"heading": "Editor's Notes", "prepend": "Exchange of Title over Reservation 13"},
   "historical citations": "Prior Codifications",
+  "prior codifications": "Prior Codifications",
+  "prior codification": "Prior Codifications",
   "history": "History",
   "law reviews and journal commentaries": "Law Reviews and Journal Commentaries",
   "legislaative history of law 20-154": "legislative history of law 20-154",
@@ -105,7 +109,6 @@ normalized_headings = {
   "new implementing regulations": "New Implementing Regulations",
   "note regarding enactment of title 29": {"heading": "Editor's Notes", "prepend": "Note Regarding Enactment of Title 29"},
   "omission of text": "Omission of Text",
-  "prior codifications": "Prior Codifications",
   "purpose of law 11-241": {"heading": "Editor's Notes", "prepend": "Purpose of Law 11-241"},
   "references in text": "References in Text",
   "resolutions": "Resolutions",

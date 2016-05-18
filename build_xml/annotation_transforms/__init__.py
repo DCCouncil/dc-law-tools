@@ -1,8 +1,11 @@
+from .clean_annos import clean_annos
 from .normalize_headings import normalize_headings
-from .make_statutes import make_statutes
-from .move_leghistory import move_leghistory
+from .process_history import process_history
+from .move_stat_info import move_stat_info
+
 transforms = [
     normalize_headings,
-    make_statutes,
-    move_leghistory,
+    clean_annos,
+    process_history,
+    move_stat_info,
 ]
