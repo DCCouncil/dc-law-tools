@@ -4,7 +4,7 @@ from .insert_t1_ch15 import insert_t1_ch15, src_file as src_insert_t1_ch15, dst_
 from .insert_tables import insert_tables, src_file as src_insert_tables, dst_file as dst_insert_tables
 from .split_placeholders import split_placeholders, src_file as src_split_placeholders, dst_file as dst_split_placeholders
 from .process_annotations import process_annotations, src_file as src_process_annotations, dst_file as dst_process_annotations
-from .add_cites import add_cites, src_file as src_add_cites, dst_file as dst_add_cites
+from .add_refs import add_refs, src_file as src_add_refs, dst_file as dst_add_refs
 from .split_up import split_up, src_file as src_split_up, dst_dir as dst_split_up
 
 jobs = OrderedDict((
@@ -12,7 +12,7 @@ jobs = OrderedDict((
 	('insert_tables', insert_tables,),
 	('split_placeholders', split_placeholders,),
 	('process_annotations', process_annotations,),
-	('add_cites', add_cites,),
+	('add_refs', add_refs,),
 	('split_up', split_up,),
 ))
 

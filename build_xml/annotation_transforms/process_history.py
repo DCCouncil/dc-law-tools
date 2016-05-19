@@ -278,7 +278,7 @@ def make_statutes(dom, dc_law_data):
         del root.attrib[k]
 
     laws_node = _make_node('collection', root, name='laws')
-    permanent_node = _make_node('collection', laws_node, name='permanent', childIgnore='1')
+    permanent_node = _make_node('collection', laws_node, name='permanent', childNoPage='1')
 
     for dc_law in dc_law_data:
         if 'err' in dc_law:

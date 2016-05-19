@@ -6,6 +6,8 @@ DIR = os.path.abspath(os.path.dirname(__file__))
 src_file = DIR + '/../working_files/dccode-annotated.xml'
 dst_file = DIR + '/../working_files/dccode-cited.xml'
 
+pdf_path = DIR + '/../../dc-law-xml/laws/permanent/sessions/{session}/{lawId}.pdf'
+
 code_cite = r'\d+-\d+(?::\d)?\w*(?:\.\d+\w*)?'
 subs = (
     (re.compile(r'(D.C. Law \d+-\w+)'), '<cite doc="\\1">\\1</cite>'),
@@ -14,7 +16,7 @@ subs = (
     (re.compile(r'&#167;\s('+code_cite+')'), '<cite abs="\\1">§ \\1</cite>'),
 )
 
-def add_cites():
+def add_refs():
     parser = et.XMLParser(remove_blank_text=True)
 
     print('adding cites')
@@ -39,9 +41,16 @@ def add_cites():
             if count:
                 node.getparent().replace(node, et.fromstring(node_text))
 
+    print('adding pdfs')
 
+    nodes = dom.xpath('//collection[@name="permanent"]/collection/document/cites/law[not(@url)]')
 
+    with click.progressbar(nodes) as progress_nodes:
+        for node in progress_nodes:
+            if os.path.isfile(pdf_path.format(**node.attrib)):
+                node.set('url', './{lawId}.pdf'.format(**node.attrib))
 
+    import ipdb
+    ipdb.set_trace()
     with open(dst_file, 'wb') as f:
         f.write(et.tostring(dom, pretty_print=True, encoding="utf-8"))
-
