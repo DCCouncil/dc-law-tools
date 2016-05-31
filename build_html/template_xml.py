@@ -2,50 +2,92 @@
 """
 template the xml using xslt 
 """
+from .preprocessors.utils import xcache, update_cache
+from copy import deepcopy
 import os, lxml.etree as et
-from tqdm import tqdm
+import json
 
 DIR = os.path.abspath(os.path.dirname(__file__))
 
 
-xslt_file = os.path.join(DIR, './dc-law.xslt')
+xslt_dir = os.path.join(DIR, 'preprocessors', 'templates')
 bld_file = os.path.join(DIR, '../working_files/dccode-html-bld.xml')
 out_dir = os.path.join(DIR, '../../dc-law-html')
+index_file = os.path.join(out_dir, 'index.bulk')
+
+generators = (
+    (
+        '/library',
+        ('.', './/collection'),
+        'library.xslt',
+        {'cloneRootCache': True},
+    ),
+    (
+        '//document[@id="D.C. Code"][1]',
+        ('.', './/container[not(cache/noPage)]', './/section'),
+        'code.xslt',
+        {'cloneRootCache': True},
+    ),
+    (
+        '//document[starts-with(@id, "D.C. Law")]',
+        ('.',),
+        'dclaw.xslt',
+        {},
+    ),
+)
 
 def template_xml():
+    print('templating...')
     with open(bld_file) as f:
         dom = et.parse(f)
-    # dom.xinclude()
-    with open(xslt_file, 'r') as f:
-        template = et.XSLT(et.parse(f))
 
-    nodes = dom.xpath('//code | //section[num] | //container[not(../@childPrefix = "Division" or ../@childPrefix = "Subtitle")]')
+    with open(index_file, 'w') as _index:
+        def index(url, node, xhtml):
+            instruction = {'index': {'_index': 'dc', '_type': 'page', '_id': url}}
+            body_node = (xhtml.xpath('//div[@class="toc"][*] | //div[@class="content"]') or [None])[0]
+            doc = {
+                'url': url,
+                'title': node.xpath('string(cache/title)'),
+                'body': get_text(body_node),
+                'num': node.xpath('string(num)'),
+            }
+            _index.write(json.dumps(instruction) + '\n')
+            _index.write(json.dumps(doc) + '\n')
 
-    for node in tqdm(nodes):
-        url = gen_url(node)
-        url_dir = os.path.dirname(url)
+        for root_xpath, node_xpaths, xslt_fn, opts in generators:
+            roots = dom.xpath(root_xpath)
+            with open(os.path.join(xslt_dir, xslt_fn), 'r') as f:
+                template = et.XSLT(et.parse(f))
+            for root in roots:
+                cloneRootCache = opts.get('cloneRootCache', False)
+                if cloneRootCache:
+                    root_cache = deepcopy(root.find('cache'))
+                    root_cache.tag = 'root'
+                for node_xpath in node_xpaths:
+                    nodes = root.xpath(node_xpath)
+                    # import ipdb
+                    # ipdb.set_trace()
+                    for node in nodes:
+                        if cloneRootCache:
+                            update_cache(node, root_cache)
+                        url = xcache(node, 'url')
+                        if url.endswith('/'):
+                            url += 'index.html'
+                        url_dir = os.path.dirname(url)
+                        xhtml = template(node)
+                        index(url, node, xhtml)
+                        try:
+                            os.makedirs(out_dir + url_dir)
+                        except:
+                            pass
+                        with open(out_dir + url, 'wb') as f:
+                            xhtml.write(f, encoding='utf-8', pretty_print=True)
 
-        genpath = dom.getpath(node)
-        xhtml = template(dom, genpath=genpath)
-        try:
-            os.makedirs(os.path.join(out_dir, url_dir))
-        except:
-            pass
-        with open(os.path.join(out_dir, url), 'wb') as f:
-            xhtml.write(f, encoding='utf-8', pretty_print=True)
-
-def gen_url(node):
-    if node.tag == 'section':
-        return os.path.join('sections', node.xpath('num/text()')[0] + '.html')
-    elif node.tag == 'code':
-        return 'index.html'
-    else:
-        ancestors = node.xpath('ancestor-or-self::container[not(../@childPrefix = "Division" or ../@childPrefix = "Subtitle")]')
-        out = ''
-        for ancestor in ancestors:
-            out += ancestor.xpath('../@childPrefix')[0] + '-' + ancestor.xpath('num/text()')[0] + '/'
-        out += 'index.html'
-        return out
-
-if __name__ == '__main__':
-    template_xml()
+def get_text(node):
+    if node is None:
+        return ''
+    text = (node.text or '').strip() + ' '
+    for child in node.iterchildren():
+        text += get_text(child)
+    text += (node.tail or '').strip() + ' '
+    return text
