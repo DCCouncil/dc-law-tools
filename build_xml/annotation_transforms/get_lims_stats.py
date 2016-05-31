@@ -61,7 +61,7 @@ for k, law in out.items():
 			'vol': str(law['MayorReview'][-1]['Volume']),
 			'page': str(law['MayorReview'][-1]['Page']),
 		}
-
+	new_law['limsUrl'] = 'http://lims.dccouncil.us/Legislation/' + k
 	law['normalized'] = new_law
 
 json.dump(out, open(lims_data_path, 'w'), sort_keys=True, indent=2)

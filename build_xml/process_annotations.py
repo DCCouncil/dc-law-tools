@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 process_annotations takes the output from process_annotations.py
 and processes all the annotations into computer-readable,
@@ -9,8 +8,6 @@ It runs all the transforms defined in annotation_transforms.
 To add a new transform, add it to the list defined in
 ./annotation_transforms/__init__.py
 """
-
-
 import os.path
 import lxml.etree as et
 from .annotation_transforms import transforms
@@ -32,6 +29,3 @@ def process_annotations():
 
     with open(dst_file, 'wb') as f:
         f.write(et.tostring(dom, pretty_print=True, encoding="utf-8"))
-
-if __name__ == '__main__':
-    process_annotations()

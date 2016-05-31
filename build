@@ -3,6 +3,7 @@ import click
 from click import echo
 import build_xml
 import build_html
+import build_index
 
 @click.group()
 def build():
@@ -10,6 +11,7 @@ def build():
 
 build_xml.click(build)
 build_html.click(build)
+build_index.click(build)
 
 if __name__ == '__main__':
     build()

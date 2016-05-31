@@ -1,0 +1,55 @@
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "text_analyzer": {
+          "type": "custom",
+          "tokenizer": "standard",
+          "filter": [
+            "asciifolding",
+            "lowercase",
+            "kstem"
+          ]
+        },
+        "path_analyzer": {
+          "type": "custom",
+          "tokenizer": "path_hierarchy"
+        }
+      }
+    }
+  },
+  "mappings": {
+    "page": {
+      "properties": {
+        "num": {
+          "type": "string",
+          "index": "analyzed",
+          "analyzer": "text_analyzer",
+          "store": "yes",
+          "boost": 100
+        },
+        "title": {
+          "term_vector": "with_positions_offsets",
+          "index": "analyzed",
+          "type": "string",
+          "analyzer": "text_analyzer",
+          "store": "yes",
+          "boost": 5
+        },
+        "body": {
+          "term_vector": "with_positions_offsets",
+          "index": "analyzed",
+          "type": "string",
+          "analyzer": "text_analyzer",
+          "store": "yes"
+        },
+        "url": {
+          "type": "string",
+          "index": "no",
+          "store": "yes",
+          "include_in_all": "false"
+        }
+      }
+    }
+  }
+}

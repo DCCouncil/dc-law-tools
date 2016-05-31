@@ -1,7 +1,7 @@
 
 
 def clean_annos(dom):
-	print('cleaning annotations')
+	print('  cleaning annotations...')
 	single_text_anno_groups = dom.xpath('//annoGroup[count(text)=1]')
 	for anno_group in single_text_anno_groups:
 		anno_group.find('text').tag = 'annotation'

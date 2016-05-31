@@ -139,63 +139,63 @@ def process_history(dom):
     #     return [cite for cite in cites if 'ast' in cite and is_partial_cite(cite['ast'])]
 
 
-    def fix(index, new_string=None):
-        """
-        helper function. fix the single cite error at index.
-        no new_string: display the "fix(index, old_string)" for manual modification.
-        MUST CALL `save()` to save fixes.
-        """
+    # def fix(index, new_string=None):
+    #     """
+    #     helper function. fix the single cite error at index.
+    #     no new_string: display the "fix(index, old_string)" for manual modification.
+    #     MUST CALL `save()` to save fixes.
+    #     """
 
-        cite_string = cites[index]['s']
-        if new_string is None:
-            return "fix({}, '{}')".format(index, cite_string)
-        fix_changes.append(cite_string)
-        cite_fixes[cite_string] = new_string
+    #     cite_string = cites[index]['s']
+    #     if new_string is None:
+    #         return "fix({}, '{}')".format(index, cite_string)
+    #     fix_changes.append(cite_string)
+    #     cite_fixes[cite_string] = new_string
 
-    def fix_hist(index, new_hist=None):
-        """
-        helper function. fix the entire hist string error at index.
-        no new_hist: display the "fix(index, old_hist)" for manual modification.
-        MUST CALL `save()` to save fixes.
-        """
-        hist = cites[index]['h']
-        if new_hist is None:
-            return "fix_hist({}, '{}')".format(index, hist)
-        hist_fixes[hist] = new_hist
+    # def fix_hist(index, new_hist=None):
+    #     """
+    #     helper function. fix the entire hist string error at index.
+    #     no new_hist: display the "fix(index, old_hist)" for manual modification.
+    #     MUST CALL `save()` to save fixes.
+    #     """
+    #     hist = cites[index]['h']
+    #     if new_hist is None:
+    #         return "fix_hist({}, '{}')".format(index, hist)
+    #     hist_fixes[hist] = new_hist
 
-    def manual(*indices):
-        """
-        helper function. add a cite string for manual review.
-        MUST CALL `save()`
-        """
-        for index in indices:
-            cite_string = cites[index]
-            hist_string_fixes['manual'].append([cite_string['s'], cite_string['s'], cite_string['h']])
+    # def manual(*indices):
+    #     """
+    #     helper function. add a cite string for manual review.
+    #     MUST CALL `save()`
+    #     """
+    #     for index in indices:
+    #         cite_string = cites[index]
+    #         hist_string_fixes['manual'].append([cite_string['s'], cite_string['s'], cite_string['h']])
 
-    def manual_hist(*indices):
-        """
-        helper function. add an entire history string for manual review.
-        MUST CALL `save().
-        """
-        for index in indices:
-            cite_string = cites[index]
-            hist_string_fixes['manual_hist'].append([cite_string['h'], cite_string['h'], cite_string['s']])
+    # def manual_hist(*indices):
+    #     """
+    #     helper function. add an entire history string for manual review.
+    #     MUST CALL `save().
+    #     """
+    #     for index in indices:
+    #         cite_string = cites[index]
+    #         hist_string_fixes['manual_hist'].append([cite_string['h'], cite_string['h'], cite_string['s']])
 
-    def save():
-        """
-        helper function. save hist_string_fixes.json changes made by any
-        of the above helper functions.
-        """
-        for item in hist_string_fixes['manual']:
-            if item[0] != item[1]:
-                cite_fixes[item[0]] = item[1]
-        hist_string_fixes['manual'] = [x for x in hist_string_fixes['manual'] if x[0] == x[1]]
-        for item in hist_string_fixes['manual_hist']:
-            if item[0] != item[1]:
-                hist_fixes[item[0]] = item[1]
-        hist_string_fixes['manual_hist'] = [x for x in hist_string_fixes['manual_hist'] if x[0] == x[1]]
-        with open(os.path.join(DIR, 'hist_string_fixes.json'), 'w') as f:
-            json.dump(hist_string_fixes, f, indent=2)
+    # def save():
+    #     """
+    #     helper function. save hist_string_fixes.json changes made by any
+    #     of the above helper functions.
+    #     """
+    #     for item in hist_string_fixes['manual']:
+    #         if item[0] != item[1]:
+    #             cite_fixes[item[0]] = item[1]
+    #     hist_string_fixes['manual'] = [x for x in hist_string_fixes['manual'] if x[0] == x[1]]
+    #     for item in hist_string_fixes['manual_hist']:
+    #         if item[0] != item[1]:
+    #             hist_fixes[item[0]] = item[1]
+    #     hist_string_fixes['manual_hist'] = [x for x in hist_string_fixes['manual_hist'] if x[0] == x[1]]
+    #     with open(os.path.join(DIR, 'hist_string_fixes.json'), 'w') as f:
+    #         json.dump(hist_string_fixes, f, indent=2)
 
 def merge_and_dedup(*dicts):
     """
@@ -271,43 +271,51 @@ def make_history_node(fixed_hist_entries):
     return fixed_hist_node
 
 def make_statutes(dom, dc_law_data):
-    root = dom.getroot()
-    code_node = _make_node('document', root, children=root.getchildren(), id='D.C. Code', **root.attrib)
-    root.tag = 'library'
-    for k in root.attrib.keys():
-        del root.attrib[k]
-
-    laws_node = _make_node('collection', root, name='laws')
-    permanent_node = _make_node('collection', laws_node, name='permanent', childNoPage='1')
-
     for dc_law in dc_law_data:
         if 'err' in dc_law:
             continue
         dc_law = dc_law['deduped_analysis']
+        make_statute(dom, dc_law)
 
-        law_node_attribs = {
-            'id': 'D.C. Law {}'.format(dc_law['lawNum'])
-        }
-        if 'flag' in dc_law:
-            law_node_attribs['flag'] = 'true'
+statute_root_node = None
+def get_statute(dom, law_num):
+    global statute_root_node
+    statute_root_node = statute_root_node or dom.find('//collection[@name="dclaws"]')
+    return statute_root_node.find('collection/document[@id="D.C. Law {}"]'.format(law_num))
 
-        session_node = permanent_node.find('collection[@name="Council Session {}"]'.format(dc_law['dcLaw']['session']))
-        if session_node is None:
-            session_node = _make_node('collection', permanent_node, name='Council Session {}'.format(dc_law['dcLaw']['session']))
-
-        try:
-            law_node = _make_node('document', session_node, **law_node_attribs)
-        except:
-            import ipdb
-            ipdb.set_trace()
-        _make_node('num', law_node, dc_law['lawNum'], type='law')
-        if 'shortTitle' in dc_law:
-            _make_node('heading', law_node, dc_law['shortTitle'])
-        date_node = _make_node('effective', law_node, dc_law.get('date', ''))
-        cite_node = _make_node('cites', law_node)
-        _make_node('law', cite_node, **dc_law['dcLaw'])
-        if 'dcRegister' in dc_law:
-            _make_node('register', cite_node, **dc_law['dcRegister'])
+def make_statute(dom, dc_law):
+    """
+    {'lawNum', 'flag', 'shortTitle', 'effective', 'limsUrl', 'dcLaw': {'session', 'lawId', 'url'}, dcRegister: {'vol', 'page'}}
+    """
+    global statute_root_node
+    # cache the statute root node to speed 
+    statute_root_node = statute_root_node or dom.find('//collection[@name="dclaws"]')
+    law_node_attribs = {
+        'id': 'D.C. Law {}'.format(dc_law['lawNum'])
+    }
+    if 'flag' in dc_law:
+        law_node_attribs['flag'] = 'true'
+    try:
+        session_node = statute_root_node.find('collection[@name="{}"]'.format(dc_law['dcLaw']['session']))
+    except:
+        import ipdb
+        ipdb.set_trace()
+    try:
+        law_node = _make_node('document', session_node, **law_node_attribs)
+    except:
+        import ipdb
+        ipdb.set_trace()
+    _make_node('num', law_node, dc_law['lawNum'], type='law')
+    if 'shortTitle' in dc_law:
+        _make_node('heading', law_node, dc_law['shortTitle'].strip('. '))
+    date_node = _make_node('effective', law_node, dc_law.get('date', ''))
+    cite_node = _make_node('cites', law_node)
+    _make_node('law', cite_node, **dc_law['dcLaw'])
+    if 'dcRegister' in dc_law:
+        _make_node('register', cite_node, **dc_law['dcRegister'])
+    if 'limsUrl' in dc_law:
+        _make_node('history', law_node, url=dc_law['limsUrl'])
+    return law_node
 
 def _make_node(tag, parent=None, text='', children=[], **attributes):
     node = et.Element(tag)

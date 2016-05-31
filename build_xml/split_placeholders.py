@@ -19,6 +19,7 @@ sec_re = re.compile(r'(\d{1,2})-(\d+)\.?(\d*)([a-z]*)')
 DIR = os.path.abspath(os.path.dirname(__file__))
 src_file = DIR + '/../working_files/dccode-tables.xml'
 dst_file = DIR + '/../working_files/dccode-no-placeholders.xml'
+library_file = os.path.join(DIR, 'library.xml')
 placeholders_file = DIR + '/placeholders.json'
 
 def split_placeholders():
@@ -28,10 +29,19 @@ def split_placeholders():
     with open(placeholders_file) as f:
         placeholders = json.load(f)
 
-    with open(src_file) as f:
+    with open(library_file) as f:
         dom = et.parse(f, parser)
+
+    with open(src_file) as f:
+        code_node = et.parse(f, parser).getroot()
+        code_node.tag = 'document'
+        code_node.set('id', 'D.C. Code')
+        old_code_node = dom.find('//document[@id="D.C. Code"]')
+        old_code_node.getparent().replace(old_code_node, code_node)
+
+    section_nodes = {node.xpath('string(num)'): node for node in dom.xpath('//section')}
     for start_num, placeholder in placeholders.items():
-        working_node = orig_node = dom.xpath('//section[string(num)="{}"]'.format(start_num))[0]
+        working_node = orig_node = section_nodes[start_num]
 
         parent_node = orig_node.getparent()
         last_num = orig_node.xpath('string(num-end)')
@@ -41,7 +51,7 @@ def split_placeholders():
         orig_node.remove(orig_node.find('num-end'))
 
         for sect_data in placeholder['sections']:
-            if sect_data['num'] != start_num and dom.xpath('//section[string(num)="{}"]'.format(sect_data['num'])):
+            if sect_data['num'] != start_num and sect_data['num'] in section_nodes:
                 continue
             new_node = deepcopy(orig_node)
             new_node.find('num').text = sect_data['num']

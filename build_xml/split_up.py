@@ -56,15 +56,13 @@ get_perm_law_fn = lambda node, num: num.split('-')[1] + '.xml'
 get_session = lambda node, num: node.get('name').split(' ')[-1]
 
 node_splits = (
-    ('//document[@id="D.C. Code"]', ('code', 'index.xml'),(
+    ('//document[@id="D.C. Code"]', ('dc', 'council', 'code', 'index.xml'),(
         ('.//container[@childPrefix = "Title"]/container', ('titles', '{num}', 'index.xml'), (
             ('.//section', ('sections', get_sec_fn,)),
          )),
     )),
-    ('//collection[@name="permanent"]', ('laws', 'permanent', 'index.xml'), (
-        ('./collection', ('sessions', get_session, 'index.xml'), (
-            ('./document', (get_perm_law_fn,)),
-        )),
+    ('//collection[@name="dclaws"]/collection', ('dc', 'council', 'sessions', get_session, 'laws', 'index.xml'), (
+        ('document', (get_perm_law_fn,)),
     )),
 )
 
@@ -79,62 +77,4 @@ def split_up():
 
     with open(os.path.join(dst_dir, 'index.xml'), 'wb') as f:
         f.write(et.tostring(dom, pretty_print=True, encoding="utf-8"))
-
-
-# def split_and_link_section(node):
-#     section_num = node.xpath('string(num)')
-#     try:
-#         if ':' in section_num:
-#             import ipdb
-#             ipdb.set_trace()
-#             title_num, section_id = section_num.split(':')
-#         else:
-#             title_num, section_id = section_num.split('-')
-#     except:
-
-#         import ipdb
-#         ipdb.set_trace()
-#     rel_path = os.path.join('.', 'sections', title_num, section_id + '.xml')
-#     split_and_link_node(node, 'code', 'titles', title_num, 'sections', section_id + '.xml')
-
-# def split_and_link_title(node):
-#     title_num = node.xpath('string(num)')
-#     sections = title.xpath('.//section')
-#     for section in sections:
-#         split_and_link_section(section)
-#     split_and_link_node(node, 'code', 'titles', title_num, 'index.xml')
-
-# def split_and_link_code(node):
-#     code = dom.xpath('//code[1]')[0]
-#     titles = code.xpath('.//container[@childPrefix = "Title"]/container')
-
-#     with click.progressbar(titles) as titles_bar:
-#         for title in titles_bar:
-#             split_and_link_title(node)
-
-#     split_and_link_node(node)
-
-#     # titles = dom.xpath('//container[@childPrefix = "Title"]/container')
-
-#     # with click.progressbar(titles) as titles_bar:
-#     #     for title in titles_bar:
-#     #         ensure_dst_dirs('code/sections/' + title.xpath('string(num)'))
-#     #         sections = title.xpath('.//section')
-#     #         for section in sections:
-#     #             split_and_link_section(section)
-#     #         split_and_link_title(title)
-
-#     # code = dom.xpath('//code[1]')[0]
-#     # import ipdb
-#     # ipdb.set_trace()
-#     # split_and_link_node(code, '', './code/index.xml')
-
-#     # print('writing statutes...')
-#     # statutes = dom.xpath('//statute')
-#     # for statute in click.progressbar(statutes):
-#     #     split_and_link_node(statute, 'statutes', 'statutes/')
-
-#     # statuteses = dom.xpath('//statutes')
-#     # for statutes in statuteses:
-#     #     split_and_link_node(statutes, '', 'statutes/')
 
