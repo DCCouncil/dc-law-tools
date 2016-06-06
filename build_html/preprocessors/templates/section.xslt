@@ -49,21 +49,23 @@
     <xsl:copy-of select="." />
   </xsl:template>
 
+
   <xsl:template match="para">
-    <div class="line" style="text-indent: {(count(./ancestor::para) + 1) * 1.25}em">
-      <p>
-        <xsl:apply-templates select="num" />
-      </p>
-    </div>
+    <xsl:if test="../text | ../heading | preceding-sibling::para">
+      <div class="line" style="text-indent: {(count(./ancestor::para) + 1) * 1.25}em">
+        <p>
+          <xsl:apply-templates select="num" />
+        </p>
+      </div>
+    </xsl:if>
     <xsl:choose>
       <xsl:when test="text | heading">
-        <xsl:apply-templates select="para|text[position()>1]|afterText" />
+        <xsl:apply-templates select="para | text[position()>1] | afterText" />
       </xsl:when>
       <xsl:otherwise>
-        <xsl:apply-templates select="./para[position()>1]|afterText"/>
+        <xsl:apply-templates select="para | afterText"/>
       </xsl:otherwise>
     </xsl:choose>
-    
   </xsl:template>
 
   <xsl:template match="num[ancestor::para]">
