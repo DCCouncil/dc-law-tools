@@ -20,14 +20,28 @@ pdf_path = DIR + '/../../dc-law-docs-laws/{session}-{lawId}.pdf'
 
 # citeParser = ParserPython(cites, ignore_case=True)
 
+
 code_cite = r'\d+-\d+(?::\d)?\w*(?:\.\d+\w*)?'
+
+def add_cite_elements(match_object):
+    'Function to subsitiue cite elements into cite lists from the regex'
+    # group0 should contain the entire list matched by the cite list
+    # matcher (can be only 1 citation)
+    in_str = match_object.group(0)
+    # because we matched the list carefully we can assume any citation of
+    # standard DC format is correct.
+    return re.sub(r'(' + code_cite + ')', '<cite abs="\\1">\\1</cite>', in_str)
+
 
 subs = (
     (re.compile(r'(D.C. Law \d+-\w+)'), '<cite doc="\\1">\\1</cite>'),
-    # (re.compile(r'§§\s('+code_cite+r',\s)*and\s('+code_cite+')'), lambda match: ', '.join(['<cite doc="{0}">{0}</cite>'.format(x) for x in match.group(1).strip(', ').split(', ')]) + ', and <cite doc="{0}">{0}</cite>'.format(match.group(2))),
-    (re.compile(r'§§\s(\d+-\d+(?::\d)?\w*(?:\.\d+\w*)?)(\s?[\w]*\s)(\d+-\d+(?::\d)?\w*(?:\.\d+\w*)?)'), '§§ <cite abs="\\1">\\1</cite>\\2<cite abs="\\3">\\3</cite>'),
-    (re.compile(r'§\s('+code_cite+')'), '<cite abs="\\1">§ \\1</cite>'),
+    (re.compile(r'(§§\s+(?:\d+-\d+(?::\d)?\w*(?:\.\d+\w*)?(?:\(\w+\))*(?:through|\s|,)+)*(?:and)?\s?)(\d+-\d+(?::\d)?\w*(?:\.\d+\w*)?)'), add_cite_elements),
+#    (re.compile(r'§§\s('+code_cite+r',\s)*and\s('+code_cite+')'), lambda match: ', '.join(['<cite doc="{0}">{0}</cite>'.format(x) for x in match.group(1).strip(', ').split(', ')]) + ', and <cite doc="{0}">{0}</cite>'.format(match.group(2))),
+#    (re.compile(r'§§\s(\d+-\d+(?::\d)?\w*(?:\.\d+\w*)?)(\s?[\w]*\s)(\d+-\d+(?::\d)?\w*(?:\.\d+\w*)?)'), '§§ <cite abs="\\1">\\1</cite>\\2<cite abs="\\3">\\3</cite>'),
+    (re.compile(r'§\s('+code_cite+')'), '§ <cite abs="\\1">\\1</cite>')
 )
+
+
 
 def add_refs():
     parser = et.XMLParser(remove_blank_text=True)
