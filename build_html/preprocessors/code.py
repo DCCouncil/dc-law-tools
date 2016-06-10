@@ -129,7 +129,8 @@ def add_abs_id(node):
 
 def make_section_html(node):
     xhtml = template(node).getroot()
-    update_cache(node, xhtml)
+    if xhtml is not None:
+        update_cache(node, xhtml)
 
 def replace_cite(node):
     ref_node = resolve_ref(node)

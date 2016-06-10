@@ -28,14 +28,18 @@
 
 <!-- SECTION -->
 
-  <xsl:template match="section">
-    <div data-swiftype-index="true">
-      <div class="line-group primary-content">
-        <xsl:apply-templates select="text | para | afterText" />
-      </div>
-      <div class="line-group annotations">
-        <xsl:apply-templates select="annotations/annoGroup" />
-      </div>
+  <xsl:template match="section[text or para or afterText or annotations/annoGroup]">
+    <div>
+      <xsl:if test="text | para | afterText">
+        <div class="line-group primary-content">
+          <xsl:apply-templates select="text | para | afterText" />
+        </div>
+      </xsl:if>
+      <xsl:if test="annotations/annoGroup">
+        <div class="line-group annotations">
+          <xsl:apply-templates select="annotations/annoGroup" />
+        </div>
+      </xsl:if>
     </div>
   </xsl:template>
 

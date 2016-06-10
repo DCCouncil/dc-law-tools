@@ -48,9 +48,9 @@
           <div class="clearfix" style="width: 100%;">
             <div id="sidebar" class="col4 quiet">
               <div class="cta">
-                <p><a class="em" href="mailto:code@dccouncil.us?subject=[ERROR]+{*/cache/url}">Report Error</a></p>
-                <p><a href="mailto:code@dccouncil.us?subject=[SUPPORT]+{*/cache/url}">Support Question</a></p>
+                <p><a href="mailto:code@dccouncil.us?subject=[ERROR]+{*/cache/url}">Report Error in Law</a></p>
                 <p><a href="mailto:code@dccouncil.us?subject=[FEEDBACK]+{*/cache/url}">Feedback on Beta</a></p>
+                <p><a href="mailto:code@dccouncil.us?subject=[SUPPORT]+{*/cache/url}">Support</a></p>
               </div>
               <h2>You Are Here</h2>
               <ul class="ancestors">

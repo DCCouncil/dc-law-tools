@@ -5,9 +5,6 @@
 
   <xsl:include href="./base.xslt" />
 
-  <xsl:template match="document" mode="content">
-  </xsl:template>
-
   <xsl:template match="document" mode="meta">
     <h2>Law Information</h2>
     <dl>

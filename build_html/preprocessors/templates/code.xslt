@@ -6,25 +6,19 @@
   <xsl:include href="./base.xslt" />
 
 <!-- SECTION -->
-  <xsl:template match="section" mode="toc">
-  </xsl:template>
-  
-  <xsl:template match="section" mode="content">
+  <xsl:template match="section[cache/div]" mode="content">
     <xsl:copy-of select="cache/div" />
   </xsl:template>
 
 <!-- CONTAINERS -->
 
-  <xsl:template match="document | container" mode="toc">
-    <div class="line-group toc" data-swiftype-index="true">
+  <xsl:template match="document | container[container or section]" mode="toc">
+    <div class="line-group toc">
         <xsl:apply-templates select="container | section" mode="tocLink" />
     </div>
   </xsl:template>
 
-  <xsl:template match="document | container[starts-with(cache/title, 'Title')]" mode="content">
-  </xsl:template>
-
-  <xsl:template match="container" mode="content">
+  <xsl:template match="container[not(starts-with(cache/title, 'Title'))]" mode="content">
       <hr />
       <xsl:apply-templates select="container | section" mode="tocBody" />
   </xsl:template>

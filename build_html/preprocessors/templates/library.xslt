@@ -6,7 +6,7 @@
   <xsl:include href="./base.xslt" />
 
   <xsl:template match="library | collection" mode="toc">
-    <div class="line-group toc" data-swiftype-index="true">
+    <div class="line-group toc">
         <xsl:apply-templates select="collection | document" mode="tocLink" />
     </div>
   </xsl:template>
