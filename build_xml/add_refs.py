@@ -8,19 +8,6 @@ dst_file = DIR + '/../working_files/dccode-cited.xml'
 
 pdf_path = DIR + '/../../dc-law-docs-laws/{session}-{lawId}.pdf'
 
-# from arpeggio import Optional, OneOrMore, ParserPython
-
-# from arpeggio import RegExMatch as _
-
-# def codeCite():     return _(r'\d+-\d+(?::\d)?\w*(?:\.\d+\w*)?')
-# def code():         return ('§', codeCite)
-# def throughCite():  return (codeCite, 'through', codeCite,)
-# def codes():        return ('§§', OneOrMore(([codeCite, throughCite], Optional(','))), 'and', [codeCite, throughCite])
-# def cites():        return [codes, code]
-
-# citeParser = ParserPython(cites, ignore_case=True)
-
-
 code_cite = r'\d+-\d+(?::\d)?\w*(?:\.\d+\w*)?'
 
 def add_cite_elements(match_object):
@@ -36,8 +23,6 @@ def add_cite_elements(match_object):
 subs = (
     (re.compile(r'(D.C. Law \d+-\w+)'), '<cite doc="\\1">\\1</cite>'),
     (re.compile(r'(§§\s+(?:\d+-\d+(?::\d)?\w*(?:\.\d+\w*)?(?:\(\w+\))*(?:through|\s|,)+)*(?:and)?\s?)(\d+-\d+(?::\d)?\w*(?:\.\d+\w*)?)'), add_cite_elements),
-#    (re.compile(r'§§\s('+code_cite+r',\s)*and\s('+code_cite+')'), lambda match: ', '.join(['<cite doc="{0}">{0}</cite>'.format(x) for x in match.group(1).strip(', ').split(', ')]) + ', and <cite doc="{0}">{0}</cite>'.format(match.group(2))),
-#    (re.compile(r'§§\s(\d+-\d+(?::\d)?\w*(?:\.\d+\w*)?)(\s?[\w]*\s)(\d+-\d+(?::\d)?\w*(?:\.\d+\w*)?)'), '§§ <cite abs="\\1">\\1</cite>\\2<cite abs="\\3">\\3</cite>'),
     (re.compile(r'§\s('+code_cite+')'), '§ <cite abs="\\1">\\1</cite>')
 )
 
@@ -59,7 +44,8 @@ def add_refs():
             node_text = et.tostring(node, encoding='utf-8').decode()
             count = 0
 
-            if '1981 Ed.' in node_text or '1973 Ed.' in node_text:
+            # this is overly conservative, but better safe than sorry
+            if '1981 Ed.' in node_text or '1973 Ed.' in node_text or 'Home Rule Act' in node_text:
                 continue
             for regex, substr in subs:
                 node_text, local_count = regex.subn(substr, node_text)
