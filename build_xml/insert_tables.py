@@ -86,6 +86,11 @@ def insert_tables():
     out = '<section>\n'.join(out).encode('utf-8')
     dom = etree.fromstring(out)
 
+    # remove any empty text elements
+    emptyTextNodes = dom.xpath('//text[not(text() or *)]')
+    for node in emptyTextNodes:
+        node.getparent().remove(node)
+
     with open(dst_file, 'wb') as f:
         f.write(etree.tostring(dom, pretty_print=True, encoding="utf-8"))
 
