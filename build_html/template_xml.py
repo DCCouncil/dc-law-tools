@@ -20,7 +20,7 @@ generators = (
         '/library',
         ('.', './/collection'),
         'library.xslt',
-        {'cloneRootCache': True},
+        {'cloneRootCache': True, 'index': False},
     ),
     (
         '//document[@id="D.C. Code"][1]',
@@ -32,7 +32,7 @@ generators = (
         '//document[starts-with(@id, "D.C. Law")]',
         ('.',),
         'dclaw.xslt',
-        {},
+        {'index': False},
     ),
 )
 
@@ -75,7 +75,8 @@ def template_xml():
                             url += 'index.html'
                         url_dir = os.path.dirname(url)
                         xhtml = template(node)
-                        index(url, node, xhtml)
+                        if opts.get('index', True):
+                            index(url, node, xhtml)
                         try:
                             os.makedirs(out_dir + url_dir)
                         except:
