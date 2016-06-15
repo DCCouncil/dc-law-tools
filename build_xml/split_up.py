@@ -53,7 +53,7 @@ def split_and_link_nodes(base_node, base_path, xpath, rel_path_pattern, child_sp
 sec_splitter_re = re.compile(r'[-:]')
 get_sec_fn = lambda node, num: sec_splitter_re.split(num, 1)[1] + '.xml'
 get_perm_law_fn = lambda node, num: num.split('-')[1] + '.xml'
-get_session = lambda node, num: node.get('name').split(' ')[-1]
+get_period = lambda node, num: node.get('name').split(' ')[-1]
 
 node_splits = (
     ('//document[@id="D.C. Code"]', ('dc', 'council', 'code', 'index.xml'),(
@@ -61,7 +61,7 @@ node_splits = (
             ('.//section', ('sections', get_sec_fn,)),
          )),
     )),
-    ('//collection[@name="dclaws"]/collection', ('dc', 'council', 'sessions', get_session, 'laws', 'index.xml'), (
+    ('//collection[@name="dclaws"]/collection', ('dc', 'council', 'periods', get_period, 'laws', 'index.xml'), (
         ('document', (get_perm_law_fn,)),
     )),
 )

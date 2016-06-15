@@ -6,7 +6,7 @@ DIR = os.path.abspath(os.path.dirname(__file__))
 src_file = DIR + '/../working_files/dccode-annotated.xml'
 dst_file = DIR + '/../working_files/dccode-cited.xml'
 
-pdf_path = DIR + '/../../dc-law-docs-laws/{session}-{lawId}.pdf'
+pdf_path = DIR + '/../../dc-law-docs-laws/{period}-{lawId}.pdf'
 
 code_cite = r'\d+-\d+(?::\d)?\w*(?:\.\d+\w*)?'
 
@@ -60,7 +60,7 @@ def add_refs():
     with click.progressbar(nodes) as progress_nodes:
         for node in progress_nodes:
             if os.path.isfile(pdf_path.format(**node.attrib)):
-                node.set('url', './docs/{session}-{lawId}.pdf'.format(**node.attrib))
+                node.set('url', './docs/{period}-{lawId}.pdf'.format(**node.attrib))
 
     with open(dst_file, 'wb') as f:
         f.write(et.tostring(dom, pretty_print=True, encoding="utf-8"))

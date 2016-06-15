@@ -285,7 +285,7 @@ def get_statute(dom, law_num):
 
 def make_statute(dom, dc_law):
     """
-    {'lawNum', 'flag', 'shortTitle', 'effective', 'limsUrl', 'dcLaw': {'session', 'lawId', 'url'}, dcRegister: {'vol', 'page'}}
+    {'lawNum', 'flag', 'shortTitle', 'effective', 'limsUrl', 'dcLaw': {'period', 'lawId', 'url'}, dcRegister: {'vol', 'page'}}
     """
     global statute_root_node
     # cache the statute root node to speed 
@@ -296,12 +296,12 @@ def make_statute(dom, dc_law):
     if 'flag' in dc_law:
         law_node_attribs['flag'] = 'true'
     try:
-        session_node = statute_root_node.find('collection[@name="{}"]'.format(dc_law['dcLaw']['session']))
+        period_node = statute_root_node.find('collection[@name="{}"]'.format(dc_law['dcLaw']['period']))
     except:
         import ipdb
         ipdb.set_trace()
     try:
-        law_node = _make_node('document', session_node, **law_node_attribs)
+        law_node = _make_node('document', period_node, **law_node_attribs)
     except:
         import ipdb
         ipdb.set_trace()

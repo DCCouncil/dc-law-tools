@@ -14,9 +14,9 @@ def sort_nodes():
     with open(src_file) as f:
         dom = et.parse(f, parser)
 
-    session_nodes = dom.xpath('/library/collection/collection')
-    for session_node in session_nodes:
-    	session_nodes[1:] = sorted(session_node[1:],key=get_normalized_dc_law_num)
+    period_nodes = dom.xpath('/library/collection/collection')
+    for period_node in period_nodes:
+    	period_nodes[1:] = sorted(period_node[1:],key=get_normalized_dc_law_num)
 
     with open(dst_file, 'wb') as f:
         f.write(et.tostring(dom, pretty_print=True, encoding="utf-8"))

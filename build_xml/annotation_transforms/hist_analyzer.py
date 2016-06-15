@@ -36,7 +36,7 @@ class BaseVisitor(PTNodeVisitor):
 		month = date_hash[c[0].lower()[:3]]
 		return {'date': '{}-{}-{}'.format(c[2], month, c[1])}
 
-	def visit_dcLaw(self, node, children):			return {'dcLaw': {'session': children[0], 'lawId': children[1]}, 'lawNum': '{}-{}'.format(*children[:2])}
+	def visit_dcLaw(self, node, children):			return {'dcLaw': {'period': children[0], 'lawId': children[1]}, 'lawNum': '{}-{}'.format(*children[:2])}
 	def visit_dcRegister(self, node, children):		return {'dcRegister': {'vol': children[0], 'page': children[2]}}
 	def visit_ruleAmend(self, node, children):		return {'dcRule': True}
 

@@ -39,7 +39,7 @@ def move_stat_info(dom):
         leg_node.getparent().remove(leg_node)
         if law_node is None:
             law_parts = law_num_split_re.split(law_num, 1)
-            law_node = make_statute(dom, {'lawNum': law_num, 'dcLaw': {'session':law_parts[0], 'lawId': law_parts[1]}})
+            law_node = make_statute(dom, {'lawNum': law_num, 'dcLaw': {'period':law_parts[0], 'lawId': law_parts[1]}})
         elif law_node.find('history/narrative') is not None:
             continue
         if not leg_node.xpath('text[2]/text()')[0].lower().startswith('law'):
@@ -56,9 +56,9 @@ def move_stat_info(dom):
             hist_node.append(narrative_node)
     print('    missing law nums', reffed_missing.keys())
 
-    session_nodes = dom.xpath('/library/collection/collection')
-    for session_node in session_nodes:
-        session_nodes[1:] = sorted(session_node[1:],key=get_normalized_dc_law_num)
+    period_nodes = dom.xpath('/library/collection/collection')
+    for period_node in period_nodes:
+        period_nodes[1:] = sorted(period_node[1:],key=get_normalized_dc_law_num)
     
 dc_law_num_re = re.compile(r'(\d+)-(\d+)(\w*)')
 def get_normalized_dc_law_num(law_node):

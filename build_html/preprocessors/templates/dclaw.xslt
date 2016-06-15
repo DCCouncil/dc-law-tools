@@ -23,7 +23,7 @@
   </xsl:template>
 
   <xsl:template match="law">
-      <dd>D.C. Law <xsl:value-of select="@session" />-<xsl:value-of select="@lawId" /><xsl:if test="@url"> (<a class="internal-link" href="{@url}">PDF</a>)</xsl:if></dd>
+      <dd>D.C. Law <xsl:value-of select="@period" />-<xsl:value-of select="@lawId" /><xsl:if test="@url"> (<a class="internal-link" href="{@url}">PDF</a>)</xsl:if></dd>
   </xsl:template>
 
   <xsl:template match="register">

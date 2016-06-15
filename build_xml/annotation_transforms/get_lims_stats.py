@@ -45,7 +45,7 @@ for k, law in out.items():
 	new_law = {
 		'lawNum': lawNum,
 		'dcLaw': {
-			'session': parsedLawNum[1],
+			'period': parsedLawNum[1],
 			'lawId': parsedLawNum[2],
 		},
 	}
