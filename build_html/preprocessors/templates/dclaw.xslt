@@ -5,6 +5,12 @@
 
   <xsl:include href="./base.xslt" />
 
+  <xsl:template match="document" mode="content">
+    <p>
+      [HTML Unavailable<xsl:if test="cites/law/@url"> (<a class="internal-link" href="{cites/law/@url}">PDF</a>)</xsl:if>]
+    </p>
+  </xsl:template>
+
   <xsl:template match="document" mode="meta">
     <h2>Law Information</h2>
     <dl>

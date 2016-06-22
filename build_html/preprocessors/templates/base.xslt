@@ -47,11 +47,6 @@
         <div class="main container">
           <div class="clearfix" style="width: 100%;">
             <div id="sidebar" class="col4 quiet">
-              <div class="cta">
-                <p><a href="mailto:code@dccouncil.us?subject=[ERROR]+{*/cache/url}">Report Error in Law</a></p>
-                <p><a href="mailto:code@dccouncil.us?subject=[FEEDBACK]+{*/cache/url}">Feedback on Beta</a></p>
-                <p><a href="mailto:code@dccouncil.us?subject=[SUPPORT]+{*/cache/url}">Support</a></p>
-              </div>
               <h2>You Are Here</h2>
               <ul class="ancestors">
                 <xsl:apply-templates select="*/cache/ancestors/ancestor" />
@@ -60,6 +55,11 @@
               <xsl:apply-templates select="*/cache/siblings/prev" />
               <xsl:apply-templates select="*/cache/siblings/next" />
               <xsl:apply-templates select="*" mode="meta" />
+
+              <div class="cta">
+                <p><a href="mailto:code@dccouncil.us?subject=[ERROR]+{*/cache/url}">Report Error</a></p>
+                <p><a href="mailto:code@dccouncil.us?subject=[FEEDBACK]+{*/cache/url}">Questions or Comments</a></p>
+              </div>
             </div>
             <div class="col8 body">
               <h1>
@@ -76,8 +76,7 @@
         </div>
         <footer>
           <div class="container center">
-            <p>The codes and laws on this website are in the public domain.
-            </p>
+            <p>The codes and laws on this website are in the public domain.</p>
             <p>
               Please do not scrape. Instead, bulk download the <a href="https://github.com/dccouncil/dc-law-html">HTML</a> or <a href="https://github.com/dccouncil/dc-law-xml">XML</a>.
             </p>
