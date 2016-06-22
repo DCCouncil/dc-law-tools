@@ -177,7 +177,7 @@ code = (
         make_section_html,
     ),
     process_xpath(
-        './/div//cite',
+        '//cache/div//cite',
         replace_cite,
     ),
 )

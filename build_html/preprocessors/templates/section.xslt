@@ -43,16 +43,22 @@
     </div>
   </xsl:template>
 
+  <xsl:template match="text[parent::annoGroup] | annotation[parent::annoGroup]">
+    <div class="line" style="text-indent: 1.5em">
+      <xsl:apply-templates select="node()" />
+    </div>
+  </xsl:template>
+
   <xsl:template match="text | afterText">
     <div class="line" style="text-indent: 1.25em">
       <xsl:apply-templates select="node()" />
     </div>
   </xsl:template>
 
-  <xsl:template match="*[ancestor::text or ancestor::afterText]">
+
+  <xsl:template match="*[ancestor::text or ancestor::afterText or ancestor::annotation]">
     <xsl:copy-of select="." />
   </xsl:template>
-
 
   <xsl:template match="para">
     <xsl:if test="../text | ../heading | preceding-sibling::para">
@@ -109,11 +115,7 @@
     <div class="line subheading">
       <xsl:value-of select="heading" />
     </div>
-    <xsl:for-each select="text | annotation">
-      <div class="line" style="text-indent: 1.5em">
-        <xsl:value-of select='.' />
-      </div>
-    </xsl:for-each>
+    <xsl:apply-templates select="text | annotation" />
   </xsl:template>
 
 </xsl:stylesheet>

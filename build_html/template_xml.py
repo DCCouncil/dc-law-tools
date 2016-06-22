@@ -51,8 +51,8 @@ def template_xml():
                 'body': get_text(body_node),
                 'num': node.xpath('string(num)'),
             }
-            _index.write(json.dumps(instruction) + '\n')
-            _index.write(json.dumps(doc) + '\n')
+            _index.write(json.dumps(instruction, sort_keys=True) + '\n')
+            _index.write(json.dumps(doc, sort_keys=True) + '\n')
 
         for root_xpath, node_xpaths, xslt_fn, opts in generators:
             roots = dom.xpath(root_xpath)
@@ -89,6 +89,6 @@ def get_text(node):
         return ''
     text = (node.text or '').strip() + ' '
     for child in node.iterchildren():
-        text += get_text(child)
+        text += get_text(child) + ' '
     text += (node.tail or '').strip() + ' '
-    return text
+    return text.strip()
