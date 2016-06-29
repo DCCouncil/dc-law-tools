@@ -64,11 +64,6 @@ class SearchResult extends Component {
 }
 
 class SearchResults extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {focii: {}};
-  }
-
   render() {
     let {results, onFocus, onBlur, waiting, totalCount, from, getNext, getPrev} = this.props;
 
@@ -103,7 +98,7 @@ export default class Search extends FocusManager {
     let onBlur = this.handleBlur;
     let getNext = this.nextResults;
     let getPrev = this.prevResults;
-    var searchResults = null
+    var searchResults = null;
     if (focused && (query.length >= this.props.minSearchLength)) {
       searchResults = <SearchResults {...{results, waiting, totalCount, from, onFocus, onBlur, getNext, getPrev}} />;
     }
@@ -132,12 +127,12 @@ export default class Search extends FocusManager {
   }
 
   makeSearch = (query, from) => {
-    if (this.state.query.length >= this.props.minSearchLength) {
+    if (query.length >= this.props.minSearchLength) {
       this._makeSearch(query, from);
     }    
   }
 
-  __makeSearch(query, from) {
+  __makeSearch = (query, from) => {
     from = from || 0;
     var xhr = new XMLHttpRequest();
     this.setState({waiting: this.state.waiting + 1});
