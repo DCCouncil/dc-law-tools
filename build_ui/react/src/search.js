@@ -161,7 +161,11 @@ export default class Search extends FocusManager {
       newState.results = results.map(function(result) { return {title: (result.highlight.title || [result._source.title])[0], body: result.highlight.body[0], url: result._source.url}});
     }
     this.setState(newState);
-    findDOMNode(this.refs.searchInput).focus()
+
+    let searchInput = findDOMNode(this.refs.searchInput);
+    if (document.activeElement != searchInput) {
+      searchInput.focus();
+    }
   }
 }
 
