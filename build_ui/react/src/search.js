@@ -5,41 +5,29 @@ import {findDOMNode} from 'react-dom';
 
 class SearchBox extends Component {
   render() {
-    let {onChange, onBlur, onFocus} = this.props;
-    onFocus = onFocus.bind(this, 'searchbox');
-    onBlur = onBlur.bind(this, 'searchbox');
+    let {onChange} = this.props;
     return (
-      <input type="search" value={this.props.query} ref="searchbox" {...{onChange, onBlur, onFocus}} placeholder="search..."/>
+      <input type="search" value={this.props.query} ref="searchbox" {...this.props} placeholder="search the code..."/>
     )
   }
 }
 
 class SearchControls extends Component {
   render() {
-    let {onFocus, onBlur, waiting, totalCount, from, count, getNext, getPrev} = this.props
+    let {waiting, totalCount, from, count, getNext, getPrev} = this.props
     if (!count) {
       return null;
     }
     return (
-      <div onMouseDown={onFocus.bind(this, 'searchControls')}
-           onMouseUp={onBlur.bind(this, 'searchControls')}
-           onTouchStart={onBlur.bind(this, 'searchControls')}
-           onTouchEnd={onBlur.bind(this, 'searchControls')}
-           >
+      <div>
         <div >
           {from} to {from + count} of {totalCount} results
         </div>
-        <button onFocus={onFocus.bind(this, 'btn-prev')}
-                onBlur={onBlur.bind(this, 'btn-prev')}
-                onClick={onFocus.bind(this, 'btn-prev')}
-                disabled={from <= 0}
+        <button disabled={from <= 0}
                 onClick={getPrev}>
           &lt; previous
         </button>
-        <button onFocus={onFocus.bind(this, 'btn-next')} 
-                onBlur={onBlur.bind(this, 'btn-next')}
-                onClick={onFocus.bind(this, 'btn-next')}
-                disabled={totalCount <= (from + count)}
+        <button disabled={totalCount <= (from + count)}
                 onClick={getNext}>
           next &gt;
         </button>
@@ -49,11 +37,9 @@ class SearchControls extends Component {
 
 class SearchResult extends Component {
   render() {
-    let {onFocus, onBlur, Key, title, body} = this.props;
-    onFocus = onFocus.bind(this, Key);
-    onBlur = onBlur.bind(this, Key);
+    let {title, body} = this.props;
     return (
-      <a href={this.props.url} tabIndex="0" {...{onFocus, onBlur}}>
+      <a href={this.props.url} tabIndex="0">
         <div className='result'>
           <h1 dangerouslySetInnerHTML={{__html: title}} />
           <p dangerouslySetInnerHTML={{__html: body}} />
@@ -65,13 +51,13 @@ class SearchResult extends Component {
 
 class SearchResults extends Component {
   render() {
-    let {results, onFocus, onBlur, waiting, totalCount, from, getNext, getPrev} = this.props;
+    let {results, waiting, totalCount, from, getNext, getPrev} = this.props;
 
     let content = (<p>no results</p>)
 
     if (results.length) {
       content = results.map((result, i) => {
-        return (<SearchResult {...result} key={'result-'+i} {...{onFocus, onBlur}} />)
+        return (<SearchResult {...result} key={'result-'+i}  />)
       })
     } else if (waiting) {
       content = (<p>searching...</p>)
@@ -79,35 +65,41 @@ class SearchResults extends Component {
     return (
       <div className='results'>
         {content}
-        <SearchControls {...{waiting, totalCount, from, onFocus, onBlur, getNext, getPrev}} count={results.length} />
+        <SearchControls {...{waiting, totalCount, from, getNext, getPrev}} count={results.length} />
       </div>
     );
   }
 }
 
-export default class Search extends FocusManager {
+export default class Search extends Component {
   constructor(props) {
     super(props);
-    this.state = {...this.state, query: '', from: 0, results: [], waiting: 0, totalCount: 0};
+    this.state = {focused: false, query: '', from: 0, results: [], waiting: 0, totalCount: 0};
     this._makeSearch = debounce(this.__makeSearch, 150)
   }
 
   render() {
     let {results, waiting, query, from, totalCount, focused} = this.state;
-    let onFocus = this.handleFocus;
-    let onBlur = this.handleBlur;
     let getNext = this.nextResults;
     let getPrev = this.prevResults;
     var searchResults = null;
     if (focused && (query.length >= this.props.minSearchLength)) {
-      searchResults = <SearchResults {...{results, waiting, totalCount, from, onFocus, onBlur, getNext, getPrev}} />;
+      searchResults = <SearchResults {...{results, waiting, totalCount, from, getNext, getPrev}} />;
     }
     return (
-      <div>
-        <SearchBox onChange={this.handleQueryChange} {...{query, onFocus, onBlur}} ref="searchInput" />
+      <FocusManager onFocus={this.handleFocus} onBlur={this.handleBlur}>
+        <SearchBox onChange={this.handleQueryChange} query={query} ref="searchInput" />
         {searchResults}
-      </div>
+      </FocusManager>
     );
+  }
+
+  handleFocus = () => this.setState({focused: true});
+  handleBlur = (e) => {
+    this.setState({focused: false});
+    if (e != 'blur') {
+      findDOMNode(this.refs.searchInput).focus();
+    }
   }
 
   handleQueryChange = (event) => {
@@ -161,11 +153,6 @@ export default class Search extends FocusManager {
       newState.results = results.map(function(result) { return {title: (result.highlight.title || [result._source.title])[0], body: result.highlight.body[0], url: result._source.url}});
     }
     this.setState(newState);
-
-    let searchInput = findDOMNode(this.refs.searchInput);
-    if (document.activeElement != searchInput) {
-      searchInput.focus();
-    }
   }
 }
 
