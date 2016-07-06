@@ -12,7 +12,7 @@ In order to run the scripts in this repo, you must have python3  and pip install
 
 ## installation
 
-from the `dc-law-tools` directory run `pip install .`
+from the `dc-law-tools` directory run `pip install -r requirements.txt`
 
 ## build commands
 
