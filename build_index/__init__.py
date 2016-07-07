@@ -1,4 +1,3 @@
-from elasticsearch import Elasticsearch
 import os
 from universalclient import Client
 

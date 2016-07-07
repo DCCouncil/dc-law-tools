@@ -4,4 +4,3 @@ click==6.2
 UniversalClient==0.6.4
 Arpeggio==1.5
 moment==0.5.1
-elasticsearch>=2.0.0,<3.0.0
