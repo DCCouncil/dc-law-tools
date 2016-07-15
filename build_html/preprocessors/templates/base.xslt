@@ -58,7 +58,8 @@
 
               <div class="cta">
                 <p><a href="mailto:code@dccouncil.us?subject=[ERROR]+{*/cache/url}">Report Error</a></p>
-                <p><a href="mailto:code@dccouncil.us?subject=[FEEDBACK]+{*/cache/url}">Questions or Comments</a></p>
+                <p><a href="mailto:code@dccouncil.us?subject=[FEEDBACK]+{*/cache/url}">Website Feedback</a></p>
+                <p>We cannot respond to questions regarding the law.</p>
               </div>
             </div>
             <div class="col8 body">
