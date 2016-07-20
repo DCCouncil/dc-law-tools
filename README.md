@@ -10,11 +10,27 @@ https://github.com/dccouncil/dc-law has issue tracker and full readme.
 
 In order to run the scripts in this repo, you must have python3  and pip installed.
 
+### Linux
+
+On Ubuntu Linux, be sure to install `python3` and `python3-dev` (required for
+the `lxml` module). You'll also need to install a recent verson of `pip` if the
+system version is too old; see the [pip installation page](https://pip.pypa.io/en/stable/installing/).
+
+Alternatively, use a packaged Python distribution like [Miniconda](http://conda.pydata.org/miniconda.html)
+to handle dependencies.
+
+Some uses of `python` or `pip` in these instructions may need to be changed to
+`python3` and `pip3`.
+
 ## installation
 
 from the `dc-law-tools` directory run `pip install -r requirements.txt`
 
 ## build commands
+
+Ensure that directories named `dc-law-xml` and `dc-law-html` exist under the
+same parent directory as the `dc-law-tools` project; the files created in the
+steps below will be put into those directories (clobbering any existing files).
 
 * `build html all`: build the dc code html by sequentially running all the follow commands:
 	* `build html merge_xml`: resolve all xml references; turn into one single xml document
