@@ -280,7 +280,8 @@ def make_statutes(dom, dc_law_data):
 statute_root_node = None
 def get_statute(dom, law_num):
     global statute_root_node
-    statute_root_node = statute_root_node or dom.find('//collection[@name="dclaws"]')
+    if statute_root_node is None:
+        statute_root_node = dom.find('//collection[@name="dclaws"]')
     return statute_root_node.find('collection/document[@id="D.C. Law {}"]'.format(law_num))
 
 def make_statute(dom, dc_law):
@@ -289,7 +290,8 @@ def make_statute(dom, dc_law):
     """
     global statute_root_node
     # cache the statute root node to speed 
-    statute_root_node = statute_root_node or dom.find('//collection[@name="dclaws"]')
+    if statute_root_node is None:
+        statute_root_node = dom.find('//collection[@name="dclaws"]')
     law_node_attribs = {
         'id': 'D.C. Law {}'.format(dc_law['lawNum'])
     }
