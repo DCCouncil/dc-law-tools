@@ -8,7 +8,7 @@ dst_file = DIR + '/../working_files/dccode-cited.xml'
 
 pdf_path = DIR + '/../../dc-law-docs-laws/{period}-{lawId}.pdf'
 
-code_cite = r'\d+-\d+(?::\d)?\w*(?:\.\d+\w*)?'
+code_cite = r'\d{1,2}(?::\d{1,2})?-\d\d\d+\w*(?:\.\d+\w*)?'
 
 def add_cite_elements(match_object):
     'Function to subsitiue cite elements into cite lists from the regex'
@@ -17,13 +17,13 @@ def add_cite_elements(match_object):
     in_str = match_object.group(0)
     # because we matched the list carefully we can assume any citation of
     # standard DC format is correct.
-    return re.sub(r'(' + code_cite + ')', '<cite abs="\\1">\\1</cite>', in_str)
+    return re.sub(r'(' + code_cite + ')', '<cite root="\\1">\\1</cite>', in_str)
 
 
 subs = (
     (re.compile(r'(D.C. Law \d+-\w+)'), '<cite doc="\\1">\\1</cite>'),
     (re.compile(r'(§§\s+(?:\d+-\d+(?::\d)?\w*(?:\.\d+\w*)?(?:\(\w+\))*(?:through|\s|,)+)*(?:and)?\s?)(\d+-\d+(?::\d)?\w*(?:\.\d+\w*)?)'), add_cite_elements),
-    (re.compile(r'§\s('+code_cite+')'), '§ <cite abs="\\1">\\1</cite>')
+    (re.compile(r'§\s('+code_cite+')'), '§ <cite root="\\1">\\1</cite>')
 )
 
 

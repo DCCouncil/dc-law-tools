@@ -85,14 +85,14 @@ def resolve_ref(node):
         print('invalid cite: ', doc_id or 'None')
         return
 
-    abs_id = node.get('abs')
-    if abs_id:
-        ref_node = doc_index['children'].get(abs_id)
+    root_id = node.get('root')
+    if root_id:
+        ref_node = doc_index['children'].get(root_id)
     else:
         ref_node = doc_index['node']
 
     if ref_node is None:
-        print('invalid cite: ', doc_id or 'None', abs_id or 'None')
+        print('invalid cite: ', doc_id or 'None', root_id or 'None')
         
     return ref_node
 
