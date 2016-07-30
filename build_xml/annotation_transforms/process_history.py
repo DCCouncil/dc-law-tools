@@ -12,6 +12,7 @@ import re, os, json
 import click
 from arpeggio import NoMatch
 from .hist_analyzer import analyze_history
+from collections import OrderedDict
 import lxml.etree as et
 DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -236,8 +237,8 @@ def get_normalized_dc_law_num(dc_law_datum):
 
 def merge_lims_data(dc_law_data):
     lims_data = json.load(open(os.path.join(DIR, 'lims_data.json')))
+    lims_data = prep_lims_data(lims_data)
     out = {}
-    lims_data = {x['normalized']['lawNum']: x['normalized'] for x in lims_data.values() if 'normalized' in x}
     for dc_law in dc_law_data:
         deduped_analysis = dc_law['deduped_analysis']
         lawNum = deduped_analysis['lawNum']
@@ -250,6 +251,17 @@ def merge_lims_data(dc_law_data):
                 dc_law['flag'] = 'true'
             dc_law['deduped_analysis'] = deduped_analysis
             del lims_data[lawNum]
+
+def prep_lims_data(lims_data):
+    out = {}
+    dedup = lims_data.pop('dedup')
+    for billNum, v in lims_data.items():
+        if 'normalized' in v:
+            lawNum = v['normalized']['lawNum']
+            if lawNum in dedup and dedup[lawNum] != billNum:
+                continue
+            out[lawNum] = v['normalized']
+    return out
 
 def fix_history(dom, hist):
     fixed_hist_nodes = [make_history_node(h) for h in hist]
@@ -320,16 +332,12 @@ def make_statute(dom, dc_law):
     return law_node
 
 def _make_node(tag, parent=None, text='', children=[], **attributes):
-    node = et.Element(tag)
+    attrs = OrderedDict(sorted([(k, (v[0] if type(v) == list else v)) for k, v in attributes.items()]))
+    node = et.Element(tag, attrs)
     if parent is not None:
         parent.append(node)
     for child in children:
         node.append(child)
-    for k, v in attributes.items():
-        if type(v) == list:
-            node.attrib[k] = v[0]
-        else:
-            node.attrib[k] = v
     if text:
         if type(text) == list:
             node.text = text[0]
