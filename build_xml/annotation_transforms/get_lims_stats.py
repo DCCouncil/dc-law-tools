@@ -29,7 +29,8 @@ out = json.load(open(lims_data_path))
 
 rawLawRegex = re.compile(r'(?:P\.)?([A-Z]*)(?:\. ?)?0*(\d+)-0*(\d+)')
 for k, law in out.items():
-	if law['Legislation'] is None:
+	law.pop('normalized', None)
+	if law.get('Legislation') is None:
 		print('skipping', k)
 		continue
 
@@ -38,6 +39,7 @@ for k, law in out.items():
 		parsedLawNum = rawLawRegex.match(rawLawNum).groups()
 	except:
 		print('skipping', rawLawNum)
+		continue
 	if parsedLawNum[0] != 'L':
 		print('skipping: ', rawLawNum)
 		continue
