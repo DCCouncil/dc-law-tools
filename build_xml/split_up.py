@@ -24,11 +24,11 @@ def split_and_link_node(node, base_path, rel_path):
     abs_path = os.path.join(dst_dir, *(base_path + rel_path))
     try:
         with open(abs_path, 'wb') as f:
-            f.write(et.tostring(node, pretty_print=True, encoding="utf-8"))
+            f.write(et.tostring(node, pretty_print=True, encoding="utf-8", xml_declaration=True))
     except IOError:
         ensure_dst_dirs(os.path.dirname(abs_path))
         with open(abs_path, 'wb') as f:
-            f.write(et.tostring(node, pretty_print=True, encoding="utf-8"))
+            f.write(et.tostring(node, pretty_print=True, encoding="utf-8", xml_declaration=True))
 
     xi = et.Element("{http://www.w3.org/2001/XInclude}include")
     xi.set("href", os.path.join(*rel_path))
