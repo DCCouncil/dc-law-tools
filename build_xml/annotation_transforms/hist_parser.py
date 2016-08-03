@@ -42,13 +42,13 @@ def date():		return (month, oCot, day, oCot, year, oCot)
 ###########
 
 def subSec():		return ('(', ident, ZeroOrMore((',', ident)), ')')
-def subSecErr():	return ('[', subSec, ']')
+def subSecErr():	return ('[', [subSec, ident], ']')
 def subSecRng():	return ([dash, 'to'], subSec)
 def subSecs():		return (ZeroOrMore(subSec), Optional(subSecRng), Optional(subSecErr))
 def secErr():		return ('[', ident, ']')
 def rawSec():		return (ident, Optional(secErr), subSecs)
 def singleSec():	return (SS, rawSec)
-def section():		return (SS, rawSec, Optional([',', 'and', 'to', dash]), ZeroOrMore(([rawSec, subSecs], ',',)))
+def section():		return (SS, rawSec, Optional([',', 'and', 'to', dash]), ZeroOrMore(([subSecs, rawSec], ',',)))
 
 ###########
 ##
@@ -60,7 +60,7 @@ def inChapter():		return (['chap', 'ch', 'c.'], oDot, ident)
 def inSubChapter():		return ('subch', oCot, ident)
 def inTitle():			return ('title', oDot, ident)
 def inArt():			return ('art', oDot, ident)
-def inPara():			return ('par', Optional('a'), oDot, ident, Optional(subSec))
+def inPara():			return ('par', Optional('a'), oDot, ident, Optional(subSecs))
 def inPage():			return ('p', oCot, numId)
 def inDiv():			return ('div', oDot, ident)
 def inAppendix():		return ('appendix', ident)
@@ -75,7 +75,7 @@ def intraCite():		return OneOrMore((supraSection, Optional(section), oComma, Opt
 ##
 ###########
 
-def stat():			return (numId, _(r'Stat'), oDot, numId, oCot, ZeroOrMore(numId, ','), Optional(('[', num, ']')), intraCite)
+def stat():			return (numId, _(r'Stat'), oCot, numId, oCot, ZeroOrMore(numId, ','), Optional(('[', num, ']')), [intraCite, (inPara, oCot, ZeroOrMore((subSecs, oCot)))])
 
 def pubLawToken():	return _(r'pub[\w.]* l[\w.]* (no\.?)?')
 def privLawToken():	return _(r'priv[\w.]* l[\w.]* (no\.?)?')

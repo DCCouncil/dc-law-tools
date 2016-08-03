@@ -39,10 +39,10 @@ def normalize_headings (dom):
     for node in dom.xpath('//annoGroup/heading'):
         final_heading_nodes.setdefault(node.text, 0)
         final_heading_nodes[node.text] += 1
-    if set(final_heading_nodes) != {"Mayor's Orders", 'Delegation of Authority', "Editor's Notes", 'Temporary Addition of Subchapter', 'History', 'New Implementing Regulations', 'Temporary Amendment of Section', 'Uniform Commercial Code Comment', 'Change in Government', 'Section References', 'Cross References', 'Temporary Addition of Section', 'Expiration of Law', 'Temporary Repeal of Section', 'Effect of Amendments', 'References in Text', 'Construction of Law', 'Short Title', 'Temporary Legislation', 'Severability of Law', 'Transfer of Functions', 'Congressional Disapproval of Acts of the Council', 'Prior Codifications', 'Emergency Legislation', 'Resolutions', 'Omission of Text', 'Repeal of Law', 'Legislative History', 'Effective Dates'}:
-        print('headings have changed')
-        import ipdb
-        ipdb.set_trace()
+    correct_headings = {"Mayor's Orders", 'Delegation of Authority', "Editor's Notes", 'Temporary Addition of Subchapter', 'History', 'New Implementing Regulations', 'Temporary Amendment of Section', 'Uniform Commercial Code Comment', 'Change in Government', 'Section References', 'Cross References', 'Temporary Addition of Section', 'Expiration of Law', 'Temporary Repeal of Section', 'Effect of Amendments', 'References in Text', 'Construction of Law', 'Short Title', 'Temporary Legislation', 'Severability of Law', 'Transfer of Functions', 'Congressional Disapproval of Acts of the Council', 'Prior Codifications', 'Emergency Legislation', 'Resolutions', 'Omission of Text', 'Repeal of Law', 'Legislative History', 'Effective Dates'}
+    diff = set(final_heading_nodes) - correct_headings
+    if diff:
+        raise Exception('headings have changed: {}'.format(diff))
     return dom
 
 def update_node(heading_node, heading_txt, prepend_txt=None):
@@ -85,6 +85,7 @@ normalized_headings = {
   "construction of emergency legislation": "Emergency Legislation",
   "cross references": "Cross References",
   "delegation of authority": "Delegation of Authority",
+  "editor's note": "Editor's Notes",
   "editor's notes": "Editor's Notes",
   "editor's notes -": "Editor's Notes",
   "editor’ notes": "Editor's Notes",

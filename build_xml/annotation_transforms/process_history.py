@@ -16,6 +16,8 @@ from collections import OrderedDict
 import lxml.etree as et
 DIR = os.path.abspath(os.path.dirname(__file__))
 
+MANUAL_FIX = False
+
 def process_history(dom):
     print('  processing history...')
 
@@ -56,6 +58,8 @@ def process_history(dom):
     with click.progressbar(cites) as progress_cites:
         for i, cite in enumerate(progress_cites):
             cite['i'] = i
+            if not cite['s']:
+                continue
             try:
                 cite['ast'] = parser.parse(cite['s'])
             except NoMatch as err:
@@ -96,107 +100,110 @@ def process_history(dom):
 
     dc_law_errors = [x for x in dc_law_data if 'err' in x]
 
+    if MANUAL_FIX:
+        err = [x for x in cites if 'err' in x]
+        good = [x for x in cites if 'err' not in x]
+        len(cite)
+        click.echo('------')
+        click.echo('{} {} {}'.format(len(cite), click.style(str(len(good)), fg='green'), click.style(str(len(err)), fg='red')))
+        click.echo('------')
+
+        def sm(start=0, count=10):
+            """ Sample errors. defaults to first 10 errors. """
+            ignored_errors = {x[0]: x for x in hist_string_fixes['manual']}
+            unignored_errors = [x for x in err if x['s'] not in ignored_errors]
+            return unignored_errors[start:min(start+count, len(unignored_errors))]
+
+        def smd(start=0, count=10):
+            """ Display a sample of errors. Defaults to first 10 errors. """
+            sample = sm(start, count)
+            for item in sample:
+                click.echo
+                click.echo(click.style('    {}) {}'.format(item['i'], item['err']), fg='red'))
+                click.echo(item['s'])
+
+        err_dict = {x['i']: x for x in err}
+
+        fix_changes = []
+
+        def is_partial_cite(ast, depth=4):
+            import ipdb
+            ipdb.set_trace()
+            if ast.rule_name == 'partialCite':
+                return True
+            if depth and hasattr(ast, '__getitem__'):
+                for child in ast:
+                    child_is_partial = is_partial_cite(child, depth=depth-1)
+                    if child_is_partial:
+                        return True
+            return False
+
+        def get_partial_cites(cites):
+            return [cite for cite in cites if 'ast' in cite and is_partial_cite(cite['ast'])]
+
+
+        def fix(index, new_string=None):
+            """
+            helper function. fix the single cite error at index.
+            no new_string: display the "fix(index, old_string)" for manual modification.
+            MUST CALL `save()` to save fixes.
+            """
+
+            cite_string = cites[index]['s']
+            if new_string is None:
+                return "fix({}, '{}')".format(index, cite_string)
+            fix_changes.append(cite_string)
+            cite_fixes[cite_string] = new_string
+
+        def fix_hist(index, new_hist=None):
+            """
+            helper function. fix the entire hist string error at index.
+            no new_hist: display the "fix(index, old_hist)" for manual modification.
+            MUST CALL `save()` to save fixes.
+            """
+            hist = cites[index]['h']
+            if new_hist is None:
+                return "fix_hist({}, '{}')".format(index, hist)
+            hist_fixes[hist] = new_hist
+
+        def manual(*indices):
+            """
+            helper function. add a cite string for manual review.
+            MUST CALL `save()`
+            """
+            for index in indices:
+                cite_string = cites[index]
+                hist_string_fixes['manual'].append([cite_string['s'], cite_string['s'], cite_string['h']])
+
+        def manual_hist(*indices):
+            """
+            helper function. add an entire history string for manual review.
+            MUST CALL `save().
+            """
+            for index in indices:
+                cite_string = cites[index]
+                hist_string_fixes['manual_hist'].append([cite_string['h'], cite_string['h'], cite_string['s']])
+
+        def save():
+            """
+            helper function. save hist_string_fixes.json changes made by any
+            of the above helper functions.
+            """
+            for item in hist_string_fixes['manual']:
+                if item[0] != item[1]:
+                    cite_fixes[item[0]] = item[1]
+            hist_string_fixes['manual'] = [x for x in hist_string_fixes['manual'] if x[0] == x[1]]
+            for item in hist_string_fixes['manual_hist']:
+                if item[0] != item[1]:
+                    hist_fixes[item[0]] = item[1]
+            hist_string_fixes['manual_hist'] = [x for x in hist_string_fixes['manual_hist'] if x[0] == x[1]]
+            with open(os.path.join(DIR, 'hist_string_fixes.json'), 'w') as f:
+                json.dump(hist_string_fixes, f, indent=2)
+        import ipdb
+        ipdb.set_trace()
     merge_lims_data(dc_law_data)
     make_statutes(dom, dc_law_data)
     fix_history(dom, hist)
-    # err = [x for x in cites if 'err' in x]
-    # good = [x for x in cites if 'err' not in x]
-    # len(cite)
-    # click.echo('------')
-    # click.echo('{} {} {}'.format(len(cite), click.style(str(len(good)), fg='green'), click.style(str(len(err)), fg='red')))
-    # click.echo('------')
-
-    # def sm(start=0, count=10):
-    #     """ Sample errors. defaults to first 10 errors. """
-    #     ignored_errors = {x[0]: x for x in hist_string_fixes['manual']}
-    #     unignored_errors = [x for x in err if x['s'] not in ignored_errors]
-    #     return unignored_errors[start:min(start+count, len(unignored_errors))]
-
-    # def smd(start=0, count=10):
-    #     """ Display a sample of errors. Defaults to first 10 errors. """
-    #     sample = sm(start, count)
-    #     for item in sample:
-    #         click.echo
-    #         click.echo(click.style('    {}) {}'.format(item['i'], item['err']), fg='red'))
-    #         click.echo(item['s'])
-
-    # err_dict = {x['i']: x for x in err}
-
-    # fix_changes = []
-
-    # def is_partial_cite(ast, depth=4):
-    #     import ipdb
-    #     ipdb.set_trace()
-    #     if ast.rule_name == 'partialCite':
-    #         return True
-    #     if depth and hasattr(ast, '__getitem__'):
-    #         for child in ast:
-    #             child_is_partial = is_partial_cite(child, depth=depth-1)
-    #             if child_is_partial:
-    #                 return True
-    #     return False
-
-    # def get_partial_cites(cites):
-    #     return [cite for cite in cites if 'ast' in cite and is_partial_cite(cite['ast'])]
-
-
-    # def fix(index, new_string=None):
-    #     """
-    #     helper function. fix the single cite error at index.
-    #     no new_string: display the "fix(index, old_string)" for manual modification.
-    #     MUST CALL `save()` to save fixes.
-    #     """
-
-    #     cite_string = cites[index]['s']
-    #     if new_string is None:
-    #         return "fix({}, '{}')".format(index, cite_string)
-    #     fix_changes.append(cite_string)
-    #     cite_fixes[cite_string] = new_string
-
-    # def fix_hist(index, new_hist=None):
-    #     """
-    #     helper function. fix the entire hist string error at index.
-    #     no new_hist: display the "fix(index, old_hist)" for manual modification.
-    #     MUST CALL `save()` to save fixes.
-    #     """
-    #     hist = cites[index]['h']
-    #     if new_hist is None:
-    #         return "fix_hist({}, '{}')".format(index, hist)
-    #     hist_fixes[hist] = new_hist
-
-    # def manual(*indices):
-    #     """
-    #     helper function. add a cite string for manual review.
-    #     MUST CALL `save()`
-    #     """
-    #     for index in indices:
-    #         cite_string = cites[index]
-    #         hist_string_fixes['manual'].append([cite_string['s'], cite_string['s'], cite_string['h']])
-
-    # def manual_hist(*indices):
-    #     """
-    #     helper function. add an entire history string for manual review.
-    #     MUST CALL `save().
-    #     """
-    #     for index in indices:
-    #         cite_string = cites[index]
-    #         hist_string_fixes['manual_hist'].append([cite_string['h'], cite_string['h'], cite_string['s']])
-
-    # def save():
-    #     """
-    #     helper function. save hist_string_fixes.json changes made by any
-    #     of the above helper functions.
-    #     """
-    #     for item in hist_string_fixes['manual']:
-    #         if item[0] != item[1]:
-    #             cite_fixes[item[0]] = item[1]
-    #     hist_string_fixes['manual'] = [x for x in hist_string_fixes['manual'] if x[0] == x[1]]
-    #     for item in hist_string_fixes['manual_hist']:
-    #         if item[0] != item[1]:
-    #             hist_fixes[item[0]] = item[1]
-    #     hist_string_fixes['manual_hist'] = [x for x in hist_string_fixes['manual_hist'] if x[0] == x[1]]
-    #     with open(os.path.join(DIR, 'hist_string_fixes.json'), 'w') as f:
-    #         json.dump(hist_string_fixes, f, indent=2)
 
 def merge_and_dedup(*dicts):
     """
@@ -241,7 +248,11 @@ def merge_lims_data(dc_law_data):
     out = {}
     for dc_law in dc_law_data:
         deduped_analysis = dc_law['deduped_analysis']
-        lawNum = deduped_analysis['lawNum']
+        try:
+            lawNum = deduped_analysis['lawNum']
+        except:
+            import ipdb
+            ipdb.set_trace()
         if lawNum in lims_data:
             if 'flag' in dc_law:
                 dc_law['deduped_analysis'] = lims_data[lawNum]
