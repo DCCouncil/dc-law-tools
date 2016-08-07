@@ -89,7 +89,7 @@
             <xsl:value-of select="following-sibling::heading" />
           </span> 
         </xsl:if>
-        <span><xsl:value-of select="following-sibling::text" /></span>
+        <span><xsl:apply-templates select="following-sibling::text" /></span>
       </xsl:when>
       <xsl:otherwise>
         <xsl:apply-templates select="../para[1]/num" />
