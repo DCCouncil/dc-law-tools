@@ -51,8 +51,12 @@
 
   <xsl:template match="text | afterText">
     <div class="line" style="text-indent: 1.25em">
-      <xsl:apply-templates select="node()" />
+      <xsl:apply-templates select="." mode="inner" />
     </div>
+  </xsl:template>
+
+  <xsl:template match="text | afterText" mode="inner">
+    <xsl:apply-templates select="node()" />
   </xsl:template>
 
 
@@ -89,7 +93,7 @@
             <xsl:value-of select="following-sibling::heading" />
           </span> 
         </xsl:if>
-        <span><xsl:apply-templates select="following-sibling::text" /></span>
+        <span><xsl:apply-templates select="following-sibling::text" mode="inner" /></span>
       </xsl:when>
       <xsl:otherwise>
         <xsl:apply-templates select="../para[1]/num" />
