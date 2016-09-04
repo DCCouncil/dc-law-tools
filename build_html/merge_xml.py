@@ -24,6 +24,3 @@ def merge_xml():
 
     with open(bld_file, 'wb') as f:
         f.write(et.tostring(dom, pretty_print=True, encoding="utf-8"))
-
-if __name__ == '__main__':
-    merge_xml()
